@@ -3,6 +3,7 @@ version: '1.0'
 config-version: 2
 profile: mlb_warehouse
 model-paths: [models]
+test-paths: [tests]
 models:
   mlb_warehouse:
     +materialized: view

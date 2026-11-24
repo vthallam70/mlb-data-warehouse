@@ -1,12 +1,58 @@
 version: 2
 models:
-  - name: games
+  - name: stg_games
+    description: One row per MLB game from the daily schedule, deduplicated across postponements.
     columns:
       - name: game_id
+        description: MLB gamePk.
         tests: [unique, not_null]
       - name: game_date
         tests: [not_null]
-      - name: home_team
+      - name: home_team_id
         tests: [not_null]
-      - name: away_team
+      - name: away_team_id
         tests: [not_null]
+      - name: game_state
+        description: completed, postponed or scheduled (derived; MLB marks postponed games 'Final').
+        tests:
+          - not_null
+          - accepted_values: {values: ['completed', 'postponed', 'scheduled']}
+  - name: dim_teams
+    description: Team dimension, one row per MLB team.
+    columns:
+      - name: team_id
+        tests: [unique, not_null]
+      - name: team_name
+        tests: [not_null]
+  - name: dim_venues
+    description: Ballpark dimension, one row per venue.
+    columns:
+      - name: venue_id
+        tests: [unique, not_null]
+  - name: dim_dates
+    description: Calendar dimension for every date in the loaded range.
+    columns:
+      - name: date_key
+        description: Integer key in YYYYMMDD form.
+        tests: [unique, not_null]
+  - name: fct_games
+    description: Game-grain fact table with scores, outcome and keys to each dimension.
+    columns:
+      - name: game_id
+        tests: [unique, not_null]
+      - name: date_key
+        tests:
+          - not_null
+          - relationships: {to: ref('dim_dates'), field: date_key}
+      - name: home_team_id
+        tests:
+          - relationships: {to: ref('dim_teams'), field: team_id}
+      - name: away_team_id
+        tests:
+          - relationships: {to: ref('dim_teams'), field: team_id}
+      - name: venue_id
+        tests:
+          - relationships: {to: ref('dim_venues'), field: venue_id}
+      - name: day_night
+        tests:
+          - accepted_values: {values: ['day', 'night']}
