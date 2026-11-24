@@ -1,0 +1,7 @@
+mlb_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/mlb.duckdb
+      threads: 2

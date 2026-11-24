@@ -1,0 +1,8 @@
+name: mlb_warehouse
+version: '1.0'
+config-version: 2
+profile: mlb_warehouse
+model-paths: [models]
+models:
+  mlb_warehouse:
+    +materialized: view
